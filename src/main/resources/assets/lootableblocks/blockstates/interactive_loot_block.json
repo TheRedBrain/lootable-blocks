@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "lootableblocks:block/interactive_loot_block"
+    }
+  }
+}

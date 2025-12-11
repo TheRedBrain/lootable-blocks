@@ -1,0 +1,141 @@
+package com.github.theredbrain.lootableblocks.block;
+
+import com.github.theredbrain.lootableblocks.LootableBlocks;
+import com.github.theredbrain.lootableblocks.block.entity.InteractiveLootBlockEntity;
+import com.github.theredbrain.lootableblocks.compat.LootableCompat;
+import com.github.theredbrain.lootableblocks.entity.player.DuckPlayerEntityMixin;
+import com.mojang.serialization.MapCodec;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockRenderType;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.BlockWithEntity;
+import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.ItemStack;
+import net.minecraft.loot.LootTable;
+import net.minecraft.loot.context.LootContextParameterSet;
+import net.minecraft.loot.context.LootContextParameters;
+import net.minecraft.loot.context.LootContextTypes;
+import net.minecraft.registry.Registries;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.registry.RegistryKeys;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
+import net.minecraft.sound.SoundCategory;
+import net.minecraft.sound.SoundEvent;
+import net.minecraft.text.Text;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.Identifier;
+import net.minecraft.util.hit.BlockHitResult;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.World;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class InteractiveLootBlock extends BlockWithEntity {
+	public static final MapCodec<InteractiveLootBlock> CODEC = createCodec(InteractiveLootBlock::new);
+
+	public InteractiveLootBlock(Settings settings) {
+		super(settings);
+	}
+
+	public MapCodec<InteractiveLootBlock> getCodec() {
+		return CODEC;
+	}
+
+	@Nullable
+	@Override
+	public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
+		return new InteractiveLootBlockEntity(pos, state);
+	}
+
+	@Override
+	public BlockRenderType getRenderType(BlockState state) {
+		return BlockRenderType.MODEL;
+	}
+
+	@Override
+	public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
+		if (state.isOf(this)) {
+			BlockEntity blockEntity = world.getBlockEntity(pos);
+			if (blockEntity instanceof InteractiveLootBlockEntity interactiveLootBlockEntity) {
+
+				if (player.isCreativeLevelTwoOp()) {
+					((DuckPlayerEntityMixin) player).lootableblocks$openInteractiveLootBlockScreen(interactiveLootBlockEntity);
+					return ActionResult.success(world.isClient);
+				} else if (world instanceof ServerWorld serverWorld && !serverWorld.isClient() && player instanceof ServerPlayerEntity serverPlayerEntity) {
+					if (interactiveLootBlockEntity.isPlayerInSet(serverPlayerEntity)) {
+						String alreadyLootedSoundId = interactiveLootBlockEntity.getAlreadyLootedSoundId();
+						if (!alreadyLootedSoundId.isEmpty()) {
+							SoundEvent soundEvent = SoundEvent.of(Identifier.of(alreadyLootedSoundId));
+							if (Registries.SOUND_EVENT.getEntry(soundEvent) != null) {
+								serverPlayerEntity.playSoundToPlayer(soundEvent, SoundCategory.BLOCKS, 1.0F, 1.0F);
+							} else {
+								LootableBlocks.info("No registered sound event of id '" + alreadyLootedSoundId + "' found.");
+							}
+						}
+						String alreadyLootedMessage = interactiveLootBlockEntity.getAlreadyLootedMessage();
+						if (!alreadyLootedMessage.isEmpty()) {
+							serverPlayerEntity.sendMessage(Text.translatable(alreadyLootedMessage), true);
+						}
+					} else {
+						Vec3d lootPos = new Vec3d(interactiveLootBlockEntity.getPos().getX(), interactiveLootBlockEntity.getPos().getY(), interactiveLootBlockEntity.getPos().getZ());
+						if (interactiveLootBlockEntity.getMode() == InteractiveLootBlockEntity.Mode.CHOICE) {
+							LootableCompat.supplyLootableLoot(Identifier.of(interactiveLootBlockEntity.getLootTableIdentifierString()), serverWorld, serverPlayerEntity, lootPos, interactiveLootBlockEntity.getRolls(), interactiveLootBlockEntity.getChoices(), true, null);
+						} else if (interactiveLootBlockEntity.getMode() == InteractiveLootBlockEntity.Mode.RANDOM) {
+							LootableCompat.supplyLootableLoot(Identifier.of(interactiveLootBlockEntity.getLootTableIdentifierString()), serverWorld, serverPlayerEntity, lootPos, interactiveLootBlockEntity.getRolls(), interactiveLootBlockEntity.getChoices(), false, null);
+						} else {
+							List<ItemStack> lootStacks = getLootItems(serverWorld, pos, player, interactiveLootBlockEntity);
+							for (ItemStack itemStack : lootStacks) {
+								player.getInventory().offerOrDrop(itemStack);
+							}
+							lootWasSupplied(serverPlayerEntity, interactiveLootBlockEntity);
+						}
+						return ActionResult.SUCCESS;
+					}
+				}
+			}
+		}
+		return ActionResult.PASS;
+	}
+
+	protected void neighborUpdate(BlockState state, World world, BlockPos pos, Block sourceBlock, BlockPos sourcePos, boolean notify) {
+		if (!world.isClient) {
+			if (world.isReceivingRedstonePower(pos) && world.getBlockEntity(pos) instanceof InteractiveLootBlockEntity interactiveLootBlockEntity) {
+				interactiveLootBlockEntity.reset();
+			}
+		}
+	}
+
+	public static void lootWasSupplied(ServerPlayerEntity serverPlayerEntity, InteractiveLootBlockEntity interactiveLootBlockEntity) {
+		if (interactiveLootBlockEntity.getTrackPlayers()) {
+			interactiveLootBlockEntity.addPlayerToSet(serverPlayerEntity);
+		}
+		String lootAcquiredSoundId = interactiveLootBlockEntity.getLootAcquiredSoundId();
+		if (!lootAcquiredSoundId.isEmpty()) {
+			SoundEvent soundEvent = SoundEvent.of(Identifier.of(lootAcquiredSoundId));
+			if (Registries.SOUND_EVENT.getEntry(soundEvent) != null) {
+				serverPlayerEntity.playSoundToPlayer(soundEvent, SoundCategory.BLOCKS, 1.0F, 1.0F);
+			} else {
+				LootableBlocks.info("No registered sound event of id '" + lootAcquiredSoundId + "' found.");
+			}
+		}
+		String lootAcquiredMessage = interactiveLootBlockEntity.getLootAcquiredMessage();
+		if (!lootAcquiredMessage.isEmpty()) {
+			serverPlayerEntity.sendMessage(Text.translatable(lootAcquiredMessage), true);
+		}
+	}
+
+	private static List<ItemStack> getLootItems(ServerWorld serverWorld, BlockPos pos, PlayerEntity player, InteractiveLootBlockEntity interactiveLootBlockEntity) {
+		List<ItemStack> list = new ArrayList<>();
+		Identifier lootTableIdentifier = Identifier.tryParse(interactiveLootBlockEntity.getLootTableIdentifierString());
+		if (lootTableIdentifier != null) {
+			LootTable lootTable = serverWorld.getServer().getReloadableRegistries().getLootTable(RegistryKey.of(RegistryKeys.LOOT_TABLE, lootTableIdentifier));
+			list = lootTable.generateLoot(new LootContextParameterSet.Builder(serverWorld).add(LootContextParameters.ORIGIN, new Vec3d(pos.getX(), pos.getY(), pos.getZ())).add(LootContextParameters.THIS_ENTITY, player).build(LootContextTypes.CHEST)); // TODO when changed to LootContextTypes.BLOCK, can do stuff depending on held item
+		}
+		return list;
+	}
+}

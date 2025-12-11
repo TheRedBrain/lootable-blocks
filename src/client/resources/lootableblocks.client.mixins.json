@@ -1,9 +1,9 @@
 {
 	"required": true,
-	"package": "com.example.mixin.client",
+	"package": "com.github.theredbrain.lootableblocks.mixin.client",
 	"compatibilityLevel": "JAVA_21",
 	"client": [
-		"ExampleClientMixin"
+		"network.ClientPlayerEntityMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1
