@@ -65,8 +65,8 @@ public enum LootableVaultState implements StringIdentifiable {
 
 	public LootableVaultState update(ServerWorld world, BlockPos pos, LootableVaultConfig config, LootableVaultServerData serverData, LootableVaultSharedData sharedData) {
 		return switch (this) {
-			case INACTIVE -> updateActiveState(world, pos, config, serverData, sharedData, config.activationRange());
-			case ACTIVE -> updateActiveState(world, pos, config, serverData, sharedData, config.deactivationRange());
+			case INACTIVE -> updateActiveState(world, pos, config, serverData, sharedData, config.activation_range());
+			case ACTIVE -> updateActiveState(world, pos, config, serverData, sharedData, config.deactivation_range());
 			case UNLOCKING -> {
 				serverData.setStateUpdatingResumeTime(world.getTime() + 20L);
 				yield EJECTING;
@@ -74,7 +74,7 @@ public enum LootableVaultState implements StringIdentifiable {
 			case EJECTING -> {
 				this.ejectReward(world, pos);
 				serverData.setStateUpdatingResumeTime(world.getTime() + 20L);
-				yield updateActiveState(world, pos, config, serverData, sharedData, config.deactivationRange());
+				yield updateActiveState(world, pos, config, serverData, sharedData, config.deactivation_range());
 			}
 		};
 	}

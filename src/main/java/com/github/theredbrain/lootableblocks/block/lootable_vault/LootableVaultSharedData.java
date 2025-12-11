@@ -21,14 +21,14 @@ public class LootableVaultSharedData {
 							ItemStack.createOptionalCodec("display_item").forGetter(data -> data.displayItem),
 							Uuids.LINKED_SET_CODEC.lenientOptionalFieldOf("connected_players", Set.of()).forGetter(data -> data.connectedPlayers),
 							Codec.DOUBLE
-									.lenientOptionalFieldOf("connected_particles_range", Double.valueOf(LootableVaultConfig.DEFAULT.deactivationRange()))
+									.lenientOptionalFieldOf("connected_particles_range", Double.valueOf(LootableVaultConfig.DEFAULT.deactivation_range()))
 									.forGetter(data -> data.connectedParticlesRange)
 					)
 					.apply(instance, LootableVaultSharedData::new)
 	);
 	private ItemStack displayItem = ItemStack.EMPTY;
 	private Set<UUID> connectedPlayers = new ObjectLinkedOpenHashSet<>();
-	private double connectedParticlesRange = LootableVaultConfig.DEFAULT.deactivationRange();
+	private double connectedParticlesRange = LootableVaultConfig.DEFAULT.deactivation_range();
 	boolean dirty;
 
 	LootableVaultSharedData(ItemStack displayItem, Set<UUID> connectedPlayers, double connectedParticlesRange) {

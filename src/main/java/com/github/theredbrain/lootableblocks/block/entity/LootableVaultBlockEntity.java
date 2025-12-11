@@ -134,10 +134,10 @@ public class LootableVaultBlockEntity extends BlockEntity {
 			LootableVaultConfig config = this.getConfig(serverWorld);
 			if (serverData != null && sharedData != null) {
 				serverPlayerEntity.incrementStat(Stats.USED.getOrCreateStat(itemStack.getItem()));
-				itemStack.decrementUnlessCreative(config.keyItem().getCount(), serverPlayerEntity);
+				itemStack.decrementUnlessCreative(config.key_item().getCount(), serverPlayerEntity);
 				Server.unlock(serverWorld, serverWorld.getBlockState(this.pos), this.pos, config, serverData, sharedData);
 				serverData.markPlayerAsRewarded(serverPlayerEntity);
-				sharedData.updateConnectedPlayers(serverWorld, this.pos, serverData, config, config.deactivationRange());
+				sharedData.updateConnectedPlayers(serverWorld, this.pos, serverData, config, config.deactivation_range());
 			}
 		}
 	}
@@ -149,7 +149,7 @@ public class LootableVaultBlockEntity extends BlockEntity {
 			LootableVaultConfig config = this.getConfig(serverWorld);
 			if (serverData != null && sharedData != null) {
 				serverData.unmarkPlayerAsRewarded(serverPlayerEntity);
-				sharedData.updateConnectedPlayers(serverWorld, this.pos, serverData, config, config.deactivationRange());
+				sharedData.updateConnectedPlayers(serverWorld, this.pos, serverData, config, config.deactivation_range());
 			}
 			this.removeLootableUses(serverPlayerEntity);
 		}
@@ -166,7 +166,7 @@ public class LootableVaultBlockEntity extends BlockEntity {
 
 	private void removeLootableUses(@Nullable ServerPlayerEntity serverPlayerEntity) {
 		if (this.world instanceof ServerWorld serverWorld) {
-			LootableCompat.removeLootableUses(LootableBlocks.identifier(serverWorld.getRegistryKey().getRegistry().toTranslationKey() + "_" + serverWorld.getRegistryKey().getValue().toTranslationKey() + "_" + this.getConfig(serverWorld).lootableIdentifier().replace(":", ".") + "_" + this.pos.getX() + "_" + this.pos.getY() + "_" + this.pos.getZ()), serverPlayerEntity);
+			LootableCompat.removeLootableUses(LootableBlocks.identifier(serverWorld.getRegistryKey().getRegistry().toTranslationKey() + "_" + serverWorld.getRegistryKey().getValue().toTranslationKey() + "_" + this.getConfig(serverWorld).lootable_identifier().replace(":", ".") + "_" + this.pos.getX() + "_" + this.pos.getY() + "_" + this.pos.getZ()), serverPlayerEntity);
 		}
 	}
 
@@ -316,7 +316,7 @@ public class LootableVaultBlockEntity extends BlockEntity {
 				} else if (serverData.hasRewardedPlayer(player)) {
 					playFailedUnlockSound(world, serverData, pos, SoundEvents.BLOCK_VAULT_REJECT_REWARDED_PLAYER);
 				} else if (player instanceof ServerPlayerEntity serverPlayerEntity) {
-					LootableCompat.supplyLootableLoot(Identifier.of(config.lootableIdentifier()), world, serverPlayerEntity, Vec3d.of(pos), config.rolls(), config.choices(), config.withChoice(), stack);
+					LootableCompat.supplyLootableLoot(Identifier.of(config.lootable_identifier()), world, serverPlayerEntity, Vec3d.of(pos), config.rolls(), config.choices(), config.with_choice(), stack);
 				}
 			}
 		}
@@ -333,8 +333,8 @@ public class LootableVaultBlockEntity extends BlockEntity {
 				sharedData.setDisplayItem(ItemStack.EMPTY);
 			} else {
 				ItemStack itemStack = ItemStack.EMPTY;
-				if (!config.displayLootTableIdentifier().isEmpty()) {
-					itemStack = generateDisplayItem(world, pos, world.getServer().getReloadableRegistries().getLootTable(RegistryKey.of(RegistryKeys.LOOT_TABLE, Identifier.of(config.displayLootTableIdentifier()))));
+				if (!config.display_loot_table_identifier().isEmpty()) {
+					itemStack = generateDisplayItem(world, pos, world.getServer().getReloadableRegistries().getLootTable(RegistryKey.of(RegistryKeys.LOOT_TABLE, Identifier.of(config.display_loot_table_identifier()))));
 				}
 				sharedData.setDisplayItem(itemStack);
 			}
@@ -357,11 +357,11 @@ public class LootableVaultBlockEntity extends BlockEntity {
 		}
 
 		private static boolean canBeUnlocked(LootableVaultConfig config, LootableVaultState state) {
-			return !Objects.equals(config.lootableIdentifier(), "") && !config.keyItem().isEmpty() && state != LootableVaultState.INACTIVE;
+			return !Objects.equals(config.lootable_identifier(), "") && !config.key_item().isEmpty() && state != LootableVaultState.INACTIVE;
 		}
 
 		private static boolean isValidKey(LootableVaultConfig config, ItemStack stack) {
-			return ItemStack.areItemsAndComponentsEqual(stack, config.keyItem()) && stack.getCount() >= config.keyItem().getCount();
+			return ItemStack.areItemsAndComponentsEqual(stack, config.key_item()) && stack.getCount() >= config.key_item().getCount();
 		}
 
 		private static boolean shouldUpdateDisplayItem(long time, LootableVaultState state) {
