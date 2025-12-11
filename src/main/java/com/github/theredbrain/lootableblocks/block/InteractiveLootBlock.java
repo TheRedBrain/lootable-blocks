@@ -99,7 +99,7 @@ public class InteractiveLootBlock extends BlockWithEntity {
 				}
 			}
 		}
-		return ActionResult.PASS;
+		return ActionResult.FAIL;
 	}
 
 	protected void neighborUpdate(BlockState state, World world, BlockPos pos, Block sourceBlock, BlockPos sourcePos, boolean notify) {
@@ -111,8 +111,10 @@ public class InteractiveLootBlock extends BlockWithEntity {
 	}
 
 	public static void lootWasSupplied(ServerPlayerEntity serverPlayerEntity, InteractiveLootBlockEntity interactiveLootBlockEntity) {
-		if (interactiveLootBlockEntity.getTrackPlayers()) {
+		if (interactiveLootBlockEntity.trackPlayers()) {
 			interactiveLootBlockEntity.addPlayerToSet(serverPlayerEntity);
+		} else {
+			interactiveLootBlockEntity.reset();
 		}
 		String lootAcquiredSoundId = interactiveLootBlockEntity.getLootAcquiredSoundId();
 		if (!lootAcquiredSoundId.isEmpty()) {

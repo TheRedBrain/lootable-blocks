@@ -3,7 +3,6 @@ package com.github.theredbrain.lootableblocks.block.lootable_vault;
 import net.minecraft.util.math.MathHelper;
 
 public class LootableVaultClientData {
-	public static final float DISPLAY_ROTATION_SPEED = 10.0F;
 	private float displayRotation;
 	private float prevDisplayRotation;
 

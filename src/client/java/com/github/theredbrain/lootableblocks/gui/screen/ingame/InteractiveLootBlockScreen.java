@@ -78,7 +78,7 @@ public class InteractiveLootBlockScreen extends Screen {
 		this.choicesField.setText(Integer.toString(this.interactiveLootBlockEntity.getChoices()));
 		this.addSelectableChild(this.choicesField);
 
-		this.trackPlayers = this.interactiveLootBlockEntity.getTrackPlayers();
+		this.trackPlayers = this.interactiveLootBlockEntity.trackPlayers();
 
 		this.trackPlayersCycleButton = this.addDrawableChild(CyclingButtonWidget.onOffBuilder().initially(this.trackPlayers).omitKeyText().build(this.width / 2 + 54, 89, 100, 20, Text.empty(), (button, trackPlayers) -> {
 			this.trackPlayers = trackPlayers;

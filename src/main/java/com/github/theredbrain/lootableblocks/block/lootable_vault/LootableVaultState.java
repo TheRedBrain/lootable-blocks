@@ -46,10 +46,6 @@ public enum LootableVaultState implements StringIdentifiable {
 		}
 	};
 
-	private static final int field_48903 = 20;
-	private static final int field_48904 = 20;
-	private static final int field_48905 = 20;
-	private static final int field_48906 = 20;
 	private final String id;
 	private final Light light;
 
@@ -76,16 +72,6 @@ public enum LootableVaultState implements StringIdentifiable {
 				yield EJECTING;
 			}
 			case EJECTING -> {
-//				if (serverData.getItemsToEject().isEmpty()) {
-//					serverData.finishEjecting();
-//					yield updateActiveState(world, pos, config, serverData, sharedData, config.deactivationRange());
-//				} else {
-////					sharedData.setDisplayItem(serverData.getItemToDisplay());
-////					boolean bl = serverData.getItemsToEject().isEmpty();
-////					int i = bl ? 20 : 20;
-////					yield EJECTING;
-//				}
-//				float f = serverData.getEjectSoundPitchModifier();
 				this.ejectReward(world, pos);
 				serverData.setStateUpdatingResumeTime(world.getTime() + 20L);
 				yield updateActiveState(world, pos, config, serverData, sharedData, config.deactivationRange());
@@ -113,7 +99,6 @@ public enum LootableVaultState implements StringIdentifiable {
 	}
 
 	private void ejectReward(ServerWorld world, BlockPos pos) {
-//		ItemDispenserBehavior.spawnItem(world, stack, 2, Direction.UP, Vec3d.ofBottomCenter(pos).offset(Direction.UP, 1.2));
 		world.syncWorldEvent(WorldEvents.VAULT_EJECTS_ITEM, pos, 0);
 		world.playSound(null, pos, SoundEvents.BLOCK_VAULT_EJECT_ITEM, SoundCategory.BLOCKS, 1.0F, 0.8F + 0.4F);
 	}

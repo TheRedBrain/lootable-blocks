@@ -11,6 +11,7 @@ import net.minecraft.client.render.block.entity.BlockEntityRendererFactories;
 public class LootableBlocksClient implements ClientModInitializer {
 	@Override
 	public void onInitializeClient() {
+		registerBlockEntityRenderer();
 		registerTransparency();
 	}
 

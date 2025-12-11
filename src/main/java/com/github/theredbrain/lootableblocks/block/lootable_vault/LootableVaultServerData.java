@@ -79,37 +79,6 @@ public class LootableVaultServerData {
 		this.stateUpdatingResumesAt = stateUpdatingResumesAt;
 		this.markDirty();
 	}
-//
-//	List<ItemStack> getItemsToEject() {
-//		return this.itemsToEject;
-//	}
-
-//	void finishEjecting() {
-//		this.totalEjectionsNeeded = 0;
-//		this.markDirty();
-//	}
-//
-//	public void setItemsToEject(List<ItemStack> itemsToEject) {
-//		this.itemsToEject.clear();
-//		this.itemsToEject.addAll(itemsToEject);
-//		this.totalEjectionsNeeded = this.itemsToEject.size();
-//		this.markDirty();
-//	}
-
-//	public ItemStack getItemToDisplay() {
-//		return this.itemsToEject.isEmpty()
-//				? ItemStack.EMPTY
-//				: (ItemStack) Objects.requireNonNullElse((ItemStack) this.itemsToEject.get(this.itemsToEject.size() - 1), ItemStack.EMPTY);
-//	}
-
-//	ItemStack getItemToEject() {
-//		if (this.itemsToEject.isEmpty()) {
-//			return ItemStack.EMPTY;
-//		} else {
-//			this.markDirty();
-//			return (ItemStack) Objects.requireNonNullElse((ItemStack) this.itemsToEject.remove(this.itemsToEject.size() - 1), ItemStack.EMPTY);
-//		}
-//	}
 
 	public void copyFrom(LootableVaultServerData data) {
 		this.stateUpdatingResumesAt = data.getStateUpdatingResumeTime();
@@ -129,9 +98,4 @@ public class LootableVaultServerData {
 		this.dirty = false;
 	}
 
-//	public float getEjectSoundPitchModifier() {
-//		return this.totalEjectionsNeeded == 1
-//				? 1.0F
-//				: 1.0F - MathHelper.getLerpProgress((float) this.getItemsToEject().size(), 1.0F, (float) this.totalEjectionsNeeded);
-//	}
 }

@@ -1,5 +1,7 @@
 package com.github.theredbrain.lootableblocks.block.entity;
 
+import com.github.theredbrain.lootableblocks.LootableBlocks;
+import com.github.theredbrain.lootableblocks.compat.LootableCompat;
 import com.github.theredbrain.lootableblocks.registry.EntityRegistry;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
@@ -7,9 +9,12 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.packet.s2c.play.BlockEntityUpdateS2CPacket;
 import net.minecraft.registry.RegistryWrapper;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
 import net.minecraft.util.StringIdentifiable;
 import net.minecraft.util.math.BlockPos;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -19,7 +24,7 @@ import java.util.Set;
 import java.util.UUID;
 
 public class InteractiveLootBlockEntity extends BlockEntity {
-	private Set<UUID> playerSet = new HashSet<>();
+	private final Set<UUID> playerSet = new HashSet<>();
 	private String lootTableIdentifierString = "";
 	private Mode mode = Mode.VANILLA;
 	private int rolls = 3;
@@ -170,6 +175,12 @@ public class InteractiveLootBlockEntity extends BlockEntity {
 		return this.createComponentlessNbt(registryLookup);
 	}
 
+	@Override
+	public void markRemoved() {
+		this.removeLootableUses(null);
+		super.markRemoved();
+	}
+
 	public String getLootTableIdentifierString() {
 		return this.lootTableIdentifierString;
 	}
@@ -202,7 +213,7 @@ public class InteractiveLootBlockEntity extends BlockEntity {
 		this.choices = choices;
 	}
 
-	public boolean getTrackPlayers() {
+	public boolean trackPlayers() {
 		return this.trackPlayers;
 	}
 
@@ -256,8 +267,14 @@ public class InteractiveLootBlockEntity extends BlockEntity {
 
 	public void reset() {
 		this.playerSet.clear();
+		this.removeLootableUses(null);
 	}
 
+	private void removeLootableUses(@Nullable ServerPlayerEntity serverPlayerEntity) {
+		if (this.world instanceof ServerWorld serverWorld) {
+			LootableCompat.removeLootableUses(LootableBlocks.identifier(serverWorld.getRegistryKey().getRegistry().toTranslationKey() + "_" + serverWorld.getRegistryKey().getValue().toTranslationKey() + "_" + this.lootTableIdentifierString.replace(":", ".") + "_" + this.pos.getX() + "_" + this.pos.getY() + "_" + this.pos.getZ()), serverPlayerEntity);
+		}
+	}
 
 	public static enum Mode implements StringIdentifiable {
 		CHOICE("choice"),

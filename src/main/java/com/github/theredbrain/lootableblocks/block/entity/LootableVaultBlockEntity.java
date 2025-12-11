@@ -108,6 +108,12 @@ public class LootableVaultBlockEntity extends BlockEntity {
 		super.readNbt(nbt, registryLookup);
 	}
 
+	@Override
+	public void markRemoved() {
+		this.removeLootableUses(null);
+		super.markRemoved();
+	}
+
 	@Nullable
 	public LootableVaultServerData getServerData() {
 		return this.world != null && !this.world.isClient ? this.serverData : null;
@@ -136,6 +142,19 @@ public class LootableVaultBlockEntity extends BlockEntity {
 		}
 	}
 
+	public void unmarkAsRewarded(ServerPlayerEntity serverPlayerEntity) {
+		if (this.world instanceof ServerWorld serverWorld) {
+			LootableVaultServerData serverData = this.getServerData();
+			LootableVaultSharedData sharedData = this.getSharedData();
+			LootableVaultConfig config = this.getConfig(serverWorld);
+			if (serverData != null && sharedData != null) {
+				serverData.unmarkPlayerAsRewarded(serverPlayerEntity);
+				sharedData.updateConnectedPlayers(serverWorld, this.pos, serverData, config, config.deactivationRange());
+			}
+			this.removeLootableUses(serverPlayerEntity);
+		}
+	}
+
 	public LootableVaultConfig getConfig(World world) {
 		LootableVaultConfig lootableVaultConfig = world.getRegistryManager().get(CustomDynamicRegistries.LOOTABLE_VAULT_CONFIG_REGISTRY_KEY).get(Identifier.of(this.lootableVaultConfigIdentifier));
 		if (lootableVaultConfig != null) {
@@ -145,12 +164,13 @@ public class LootableVaultBlockEntity extends BlockEntity {
 		return LootableVaultConfig.DEFAULT;
 	}
 
+	private void removeLootableUses(@Nullable ServerPlayerEntity serverPlayerEntity) {
+		if (this.world instanceof ServerWorld serverWorld) {
+			LootableCompat.removeLootableUses(LootableBlocks.identifier(serverWorld.getRegistryKey().getRegistry().toTranslationKey() + "_" + serverWorld.getRegistryKey().getValue().toTranslationKey() + "_" + this.getConfig(serverWorld).lootableIdentifier().replace(":", ".") + "_" + this.pos.getX() + "_" + this.pos.getY() + "_" + this.pos.getZ()), serverPlayerEntity);
+		}
+	}
+
 	public static final class Client {
-		private static final int field_48870 = 20;
-		private static final float field_48871 = 0.5F;
-		private static final float field_48872 = 0.02F;
-		private static final int field_48873 = 20;
-		private static final int field_48874 = 20;
 
 		public static void tick(World world, BlockPos pos, BlockState state, LootableVaultClientData clientData, LootableVaultSharedData sharedData) {
 			clientData.rotateDisplay();
@@ -162,6 +182,7 @@ public class LootableVaultBlockEntity extends BlockEntity {
 			playAmbientSound(world, pos, sharedData);
 		}
 
+		// TODO research custom world events
 		public static void spawnActivateParticles(World world, BlockPos pos, BlockState state, LootableVaultSharedData sharedData, ParticleEffect particle) {
 			spawnConnectedParticles(world, pos, state, sharedData);
 			Random random = world.random;
@@ -252,9 +273,6 @@ public class LootableVaultBlockEntity extends BlockEntity {
 	}
 
 	public static final class Server {
-		private static final int UNLOCK_TIME = 14;
-		private static final int DISPLAY_UPDATE_INTERVAL = 20;
-		private static final int FAILED_UNLOCK_COOLDOWN = 15;
 
 		public static void tick(ServerWorld world, BlockPos pos, BlockState state, LootableVaultConfig config, LootableVaultServerData serverData, LootableVaultSharedData sharedData) {
 			LootableVaultState vaultState = state.get(LootableVaultBlock.LOOTABLE_VAULT_STATE);
@@ -294,15 +312,11 @@ public class LootableVaultBlockEntity extends BlockEntity {
 			LootableVaultState vaultState = state.get(LootableVaultBlock.LOOTABLE_VAULT_STATE);
 			if (canBeUnlocked(config, vaultState)) {
 				if (!isValidKey(config, stack)) {
-					LootableBlocks.info("invalid key");
 					playFailedUnlockSound(world, serverData, pos, SoundEvents.BLOCK_VAULT_INSERT_ITEM_FAIL);
 				} else if (serverData.hasRewardedPlayer(player)) {
-					LootableBlocks.info("player already rewarded");
 					playFailedUnlockSound(world, serverData, pos, SoundEvents.BLOCK_VAULT_REJECT_REWARDED_PLAYER);
 				} else if (player instanceof ServerPlayerEntity serverPlayerEntity) {
 					LootableCompat.supplyLootableLoot(Identifier.of(config.lootableIdentifier()), world, serverPlayerEntity, Vec3d.of(pos), config.rolls(), config.choices(), config.withChoice(), stack);
-					serverData.markPlayerAsRewarded(player);
-					sharedData.updateConnectedPlayers(world, pos, serverData, config, config.deactivationRange());
 				}
 			}
 		}
