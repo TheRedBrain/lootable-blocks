@@ -44,7 +44,7 @@ public class LootableCompat {
 							lootableVaultBlockEntity.unmarkAsRewarded(serverPlayerEntity);
 						}
 					},
-					new IdKey(LootableBlocks.identifier(world.getRegistryKey().getRegistry().toTranslationKey() + "_" + world.getRegistryKey().getValue().toTranslationKey() + "_" + identifier.toTranslationKey() + "_" + pos.x + "_" + pos.y + "_" + pos.z)),
+					getIdKeyForIdentifier(world, pos, identifier),
 					rolls,
 					choices
 			);
@@ -67,7 +67,20 @@ public class LootableCompat {
 		}
 	}
 
-	public static void removeLootableUses(Identifier identifier, @Nullable ServerPlayerEntity serverPlayerEntity) {
+	public static void removeLootableUses(ServerWorld world, Vec3d pos, String identifierString, @Nullable ServerPlayerEntity serverPlayerEntity) {
+		removeLootableUses(world, pos, Identifier.of(identifierString), serverPlayerEntity);
+	}
+
+	public static void removeLootableUses(ServerWorld world, Vec3d pos, Identifier identifier, @Nullable ServerPlayerEntity serverPlayerEntity) {
+		if (serverPlayerEntity != null) {
+			LootablesApi.resetKey(getIdKeyForIdentifier(world, pos, identifier), serverPlayerEntity);
+		} else {
+			LootablesApi.resetKey(getIdKeyForIdentifier(world, pos, identifier), world.getServer());
+		}
+	}
+
+	public static IdKey getIdKeyForIdentifier(ServerWorld world, Vec3d pos, Identifier identifier) {
+		return new IdKey(LootableBlocks.identifier(world.getRegistryKey().getRegistry().toTranslationKey() + "_" + world.getRegistryKey().getValue().toTranslationKey() + "_" + identifier.toTranslationKey() + "_" + pos.getX() + "_" + pos.getY() + "_" + pos.getZ()));
 	}
 
 }

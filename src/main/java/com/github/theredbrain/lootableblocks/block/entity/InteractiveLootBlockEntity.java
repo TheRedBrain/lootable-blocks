@@ -1,6 +1,5 @@
 package com.github.theredbrain.lootableblocks.block.entity;
 
-import com.github.theredbrain.lootableblocks.LootableBlocks;
 import com.github.theredbrain.lootableblocks.compat.LootableCompat;
 import com.github.theredbrain.lootableblocks.registry.EntityRegistry;
 import net.minecraft.block.BlockState;
@@ -9,12 +8,11 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.packet.s2c.play.BlockEntityUpdateS2CPacket;
 import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
 import net.minecraft.util.StringIdentifiable;
 import net.minecraft.util.math.BlockPos;
-import org.jetbrains.annotations.Nullable;
+import net.minecraft.util.math.Vec3d;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -177,7 +175,9 @@ public class InteractiveLootBlockEntity extends BlockEntity {
 
 	@Override
 	public void markRemoved() {
-		this.removeLootableUses(null);
+		if (this.world instanceof ServerWorld serverWorld) {
+			LootableCompat.removeLootableUses(serverWorld, Vec3d.of(this.pos), this.lootTableIdentifierString, null);
+		}
 		super.markRemoved();
 	}
 
@@ -267,12 +267,8 @@ public class InteractiveLootBlockEntity extends BlockEntity {
 
 	public void reset() {
 		this.playerSet.clear();
-		this.removeLootableUses(null);
-	}
-
-	private void removeLootableUses(@Nullable ServerPlayerEntity serverPlayerEntity) {
 		if (this.world instanceof ServerWorld serverWorld) {
-			LootableCompat.removeLootableUses(LootableBlocks.identifier(serverWorld.getRegistryKey().getRegistry().toTranslationKey() + "_" + serverWorld.getRegistryKey().getValue().toTranslationKey() + "_" + this.lootTableIdentifierString.replace(":", ".") + "_" + this.pos.getX() + "_" + this.pos.getY() + "_" + this.pos.getZ()), serverPlayerEntity);
+			LootableCompat.removeLootableUses(serverWorld, Vec3d.of(this.pos), this.lootTableIdentifierString, null);
 		}
 	}
 

@@ -110,7 +110,9 @@ public class LootableVaultBlockEntity extends BlockEntity {
 
 	@Override
 	public void markRemoved() {
-		this.removeLootableUses(null);
+		if (this.world instanceof ServerWorld serverWorld) {
+			this.removeLootableUses(serverWorld, Vec3d.of(this.pos), null);
+		}
 		super.markRemoved();
 	}
 
@@ -151,7 +153,7 @@ public class LootableVaultBlockEntity extends BlockEntity {
 				serverData.unmarkPlayerAsRewarded(serverPlayerEntity);
 				sharedData.updateConnectedPlayers(serverWorld, this.pos, serverData, config, config.deactivation_range());
 			}
-			this.removeLootableUses(serverPlayerEntity);
+			this.removeLootableUses(serverWorld, Vec3d.of(this.pos), serverPlayerEntity);
 		}
 	}
 
@@ -164,10 +166,8 @@ public class LootableVaultBlockEntity extends BlockEntity {
 		return LootableVaultConfig.DEFAULT;
 	}
 
-	private void removeLootableUses(@Nullable ServerPlayerEntity serverPlayerEntity) {
-		if (this.world instanceof ServerWorld serverWorld) {
-			LootableCompat.removeLootableUses(LootableBlocks.identifier(serverWorld.getRegistryKey().getRegistry().toTranslationKey() + "_" + serverWorld.getRegistryKey().getValue().toTranslationKey() + "_" + this.getConfig(serverWorld).lootable_identifier().replace(":", ".") + "_" + this.pos.getX() + "_" + this.pos.getY() + "_" + this.pos.getZ()), serverPlayerEntity);
-		}
+	private void removeLootableUses(ServerWorld serverWorld, Vec3d pos, @Nullable ServerPlayerEntity serverPlayerEntity) {
+			LootableCompat.removeLootableUses(serverWorld, pos, this.getConfig(serverWorld).lootable_identifier(), serverPlayerEntity);
 	}
 
 	public static final class Client {
