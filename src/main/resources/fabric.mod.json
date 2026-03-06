@@ -3,7 +3,7 @@
 	"id": "lootableblocks",
 	"version": "${version}",
 	"name": "Lootable Blocks",
-	"description": "This is an example description! Tell everyone what your mod is about!",
+	"description": "Lootable Blocks adds various blocks which can supply 'Lootables', an extended version of loot tables added by the 'Lootables' mod.",
 	"authors": [
 		"TheRedBrain"
 	],
