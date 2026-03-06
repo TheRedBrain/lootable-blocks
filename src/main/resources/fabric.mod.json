@@ -35,4 +35,8 @@
 		"fzzy_config": ">=${fzzy_config_version}",
 		"lootables": ">=${lootable_version}"
 	}
+	},
+	"suggests": {
+		"loot_n_explore": "*"
+  }
 }

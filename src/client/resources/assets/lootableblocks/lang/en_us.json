@@ -20,5 +20,6 @@
 
 
 	"block.lootableblocks.interactive_loot_block": "Interactive Loot Block",
-	"block.lootableblocks.lootable_vault_block": "Lootable Vault"
+	"block.lootableblocks.lootable_vault_block": "Lootable Vault",
+	"block.lootableblocks.lootable_frozen_vault_block": "Lootable Frozen Vault"
 }

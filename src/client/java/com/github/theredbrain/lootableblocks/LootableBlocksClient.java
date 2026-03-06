@@ -17,6 +17,7 @@ public class LootableBlocksClient implements ClientModInitializer {
 
 	private void registerTransparency() {
 		BlockRenderLayerMap.INSTANCE.putBlock(BlockRegistry.LOOTABLE_VAULT_BLOCK, RenderLayer.getCutout());
+		BlockRenderLayerMap.INSTANCE.putBlock(BlockRegistry.LOOTABLE_FROZEN_VAULT_BLOCK, RenderLayer.getCutout());
 	}
 
 	private void registerBlockEntityRenderer() {
