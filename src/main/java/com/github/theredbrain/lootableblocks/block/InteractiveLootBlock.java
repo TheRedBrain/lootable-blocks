@@ -2,7 +2,6 @@ package com.github.theredbrain.lootableblocks.block;
 
 import com.github.theredbrain.lootableblocks.LootableBlocks;
 import com.github.theredbrain.lootableblocks.block.entity.InteractiveLootBlockEntity;
-import com.github.theredbrain.lootableblocks.compat.LootableCompat;
 import com.github.theredbrain.lootableblocks.entity.player.DuckPlayerEntityMixin;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.block.Block;
@@ -84,9 +83,9 @@ public class InteractiveLootBlock extends BlockWithEntity {
 					} else {
 						Vec3d lootPos = new Vec3d(interactiveLootBlockEntity.getPos().getX(), interactiveLootBlockEntity.getPos().getY(), interactiveLootBlockEntity.getPos().getZ());
 						if (interactiveLootBlockEntity.getMode() == InteractiveLootBlockEntity.Mode.CHOICE) {
-							LootableCompat.supplyLootableLoot(Identifier.of(interactiveLootBlockEntity.getLootTableIdentifierString()), serverWorld, serverPlayerEntity, lootPos, interactiveLootBlockEntity.getRolls(), interactiveLootBlockEntity.getChoices(), true, null);
+							LootableBlocks.supplyLootableLoot(Identifier.of(interactiveLootBlockEntity.getLootTableIdentifierString()), serverWorld, serverPlayerEntity, lootPos, interactiveLootBlockEntity.getRolls(), interactiveLootBlockEntity.getChoices(), true, null);
 						} else if (interactiveLootBlockEntity.getMode() == InteractiveLootBlockEntity.Mode.RANDOM) {
-							LootableCompat.supplyLootableLoot(Identifier.of(interactiveLootBlockEntity.getLootTableIdentifierString()), serverWorld, serverPlayerEntity, lootPos, interactiveLootBlockEntity.getRolls(), interactiveLootBlockEntity.getChoices(), false, null);
+							LootableBlocks.supplyLootableLoot(Identifier.of(interactiveLootBlockEntity.getLootTableIdentifierString()), serverWorld, serverPlayerEntity, lootPos, interactiveLootBlockEntity.getRolls(), interactiveLootBlockEntity.getChoices(), false, null);
 						} else {
 							List<ItemStack> lootStacks = getLootItems(serverWorld, pos, player, interactiveLootBlockEntity);
 							for (ItemStack itemStack : lootStacks) {

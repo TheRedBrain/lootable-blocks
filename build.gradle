@@ -141,7 +141,7 @@ if (project.hasProperty('release_type')) {
 			// The type can either be `project` or `version`
 			required.project 'fzzy-config'
 			required.project 'fabric-api'
-			required.project 'lootables'
+			optional.project 'lootables'
 			optional.project 'loot-n-explore'
 		}
 	}

@@ -6,7 +6,6 @@ import com.github.theredbrain.lootableblocks.block.lootable_vault.LootableVaultC
 import com.github.theredbrain.lootableblocks.block.lootable_vault.LootableVaultServerData;
 import com.github.theredbrain.lootableblocks.block.lootable_vault.LootableVaultSharedData;
 import com.github.theredbrain.lootableblocks.block.lootable_vault.LootableVaultState;
-import com.github.theredbrain.lootableblocks.compat.LootableCompat;
 import com.github.theredbrain.lootableblocks.data.LootableVaultConfig;
 import com.github.theredbrain.lootableblocks.registry.CustomDynamicRegistries;
 import com.github.theredbrain.lootableblocks.registry.EntityRegistry;
@@ -167,7 +166,7 @@ public class LootableVaultBlockEntity extends BlockEntity {
 	}
 
 	private void removeLootableUses(ServerWorld serverWorld, Vec3d pos, @Nullable ServerPlayerEntity serverPlayerEntity) {
-			LootableCompat.removeLootableUses(serverWorld, pos, this.getConfig(serverWorld).lootable_identifier(), serverPlayerEntity);
+		LootableBlocks.removeLootableUses(serverWorld, pos, this.getConfig(serverWorld).lootable_identifier(), serverPlayerEntity);
 	}
 
 	public static final class Client {
@@ -316,7 +315,7 @@ public class LootableVaultBlockEntity extends BlockEntity {
 				} else if (serverData.hasRewardedPlayer(player)) {
 					playFailedUnlockSound(world, serverData, pos, SoundEvents.BLOCK_VAULT_REJECT_REWARDED_PLAYER);
 				} else if (player instanceof ServerPlayerEntity serverPlayerEntity) {
-					LootableCompat.supplyLootableLoot(Identifier.of(config.lootable_identifier()), world, serverPlayerEntity, Vec3d.of(pos), config.rolls(), config.choices(), config.with_choice(), stack);
+					LootableBlocks.supplyLootableLoot(Identifier.of(config.lootable_identifier()), world, serverPlayerEntity, Vec3d.of(pos), config.rolls(), config.choices(), config.with_choice(), stack);
 				}
 			}
 		}

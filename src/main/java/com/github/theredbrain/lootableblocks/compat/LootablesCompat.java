@@ -15,7 +15,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import org.jetbrains.annotations.Nullable;
 
-public class LootableCompat {
+public class LootablesCompat {
 
 	public static void supplyLootableLoot(Identifier identifier, ServerWorld world, ServerPlayerEntity serverPlayerEntity, Vec3d pos, int rolls, int choices, boolean withChoice, @Nullable ItemStack itemStack) {
 		if (withChoice) {
@@ -79,7 +79,7 @@ public class LootableCompat {
 		}
 	}
 
-	public static IdKey getIdKeyForIdentifier(ServerWorld world, Vec3d pos, Identifier identifier) {
+	private static IdKey getIdKeyForIdentifier(ServerWorld world, Vec3d pos, Identifier identifier) {
 		return new IdKey(LootableBlocks.identifier(world.getRegistryKey().getRegistry().toTranslationKey() + "_" + world.getRegistryKey().getValue().toTranslationKey() + "_" + identifier.toTranslationKey() + "_" + pos.getX() + "_" + pos.getY() + "_" + pos.getZ()));
 	}
 

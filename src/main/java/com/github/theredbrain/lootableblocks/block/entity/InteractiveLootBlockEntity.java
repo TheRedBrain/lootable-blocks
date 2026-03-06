@@ -1,6 +1,6 @@
 package com.github.theredbrain.lootableblocks.block.entity;
 
-import com.github.theredbrain.lootableblocks.compat.LootableCompat;
+import com.github.theredbrain.lootableblocks.LootableBlocks;
 import com.github.theredbrain.lootableblocks.registry.EntityRegistry;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
@@ -176,7 +176,7 @@ public class InteractiveLootBlockEntity extends BlockEntity {
 	@Override
 	public void markRemoved() {
 		if (this.world instanceof ServerWorld serverWorld) {
-			LootableCompat.removeLootableUses(serverWorld, Vec3d.of(this.pos), this.lootTableIdentifierString, null);
+			LootableBlocks.removeLootableUses(serverWorld, Vec3d.of(this.pos), this.lootTableIdentifierString, null);
 		}
 		super.markRemoved();
 	}
@@ -268,7 +268,7 @@ public class InteractiveLootBlockEntity extends BlockEntity {
 	public void reset() {
 		this.playerSet.clear();
 		if (this.world instanceof ServerWorld serverWorld) {
-			LootableCompat.removeLootableUses(serverWorld, Vec3d.of(this.pos), this.lootTableIdentifierString, null);
+			LootableBlocks.removeLootableUses(serverWorld, Vec3d.of(this.pos), this.lootTableIdentifierString, null);
 		}
 	}
 
